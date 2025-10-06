@@ -4,7 +4,7 @@ const API_URL = 'https://efrei-fullstackjs-6.onrender.com'; // backend Render de
 
 // ➡️ Auth
 export const registerUser = async (data) => {
-    const res = await fetch(`${API_URL}/register`, {
+    const res = await fetch(`${API_URL}/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
@@ -13,7 +13,7 @@ export const registerUser = async (data) => {
 };
 
 export const loginUser = async (data) => {
-    const res = await fetch(`${API_URL}/login`, {
+    const res = await fetch(`${API_URL}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
