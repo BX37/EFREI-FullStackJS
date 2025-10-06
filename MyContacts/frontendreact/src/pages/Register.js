@@ -1,36 +1,51 @@
+// src/pages/Register.js
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { registerUser } from '../services/api';
+import { useNavigate } from 'react-router-dom';
 
-export default function Register() {
+const Register = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
     const navigate = useNavigate();
 
-    const handleSubmit = async (e) => {
+    const handleRegister = async (e) => {
         e.preventDefault();
         try {
-            const res = await registerUser({ email, password });
-            if (res.message === 'Utilisateur créé avec succès') {
+            const data = await registerUser({ email, password });
+            if (data.message === 'Utilisateur créé avec succès') {
+                alert('Compte créé ! Connectez-vous.');
                 navigate('/login');
             } else {
-                setError(res.message || 'Erreur inscription');
+                alert(data.message || 'Erreur lors de l\'inscription');
             }
         } catch (err) {
-            setError('Erreur serveur');
+            console.error(err);
+            alert('Erreur serveur');
         }
     };
 
     return (
         <div>
-            <h2>Register</h2>
-            <form onSubmit={handleSubmit}>
-                <input placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} />
-                <input placeholder="Password" type="password" value={password} onChange={e => setPassword(e.target.value)} />
+            <h1>Register</h1>
+            <form onSubmit={handleRegister}>
+                <input
+                    type="email"
+                    placeholder="Email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                />
+                <input
+                    type="password"
+                    placeholder="Mot de passe"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                />
                 <button type="submit">S'inscrire</button>
             </form>
-            {error && <p>{error}</p>}
         </div>
     );
-}
+};
+
+export default Register;
