@@ -10,7 +10,7 @@ export default function Contacts() {
 
     useEffect(() => {
         fetchContacts();
-    }, []);
+    }, [fetchContacts]); // pour supprimer lesproblèmes de dépendances dans Netlify
 
     const fetchContacts = async () => {
         const data = await getContacts(token);
