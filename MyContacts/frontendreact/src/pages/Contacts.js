@@ -22,6 +22,7 @@ const Contacts = () => {
         setLoading(true);
         try {
             const data = await getContacts(token);
+            console.log('Données reçues:', data); // Log pour vérifier la structure de la réponse
             if (Array.isArray(data)) {
                 setContacts(data);
             } else {
@@ -30,9 +31,9 @@ const Contacts = () => {
             }
         } catch (err) {
             console.error('Erreur fetchContacts:', err);
-            if (err.response && err.response.status === 401) {
-                localStorage.removeItem('token');
-                navigate('/login');
+            if (err.response) {
+                console.error('Réponse du serveur:', err.response.data);
+                setMessage(`❌ Erreur : ${err.response.data.message || 'Erreur inconnue'}`);
             } else {
                 setMessage('❌ Erreur lors de la récupération des contacts.');
             }
@@ -40,6 +41,7 @@ const Contacts = () => {
             setLoading(false);
         }
     }, [token, navigate]);
+
 
     useEffect(() => {
         fetchContacts();
