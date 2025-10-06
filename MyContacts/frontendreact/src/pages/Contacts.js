@@ -1,4 +1,3 @@
-// src/pages/Contacts.js
 import { useState, useEffect, useCallback } from 'react';
 import { getContacts, createContact, updateContact, deleteContact } from '../services/api';
 
@@ -8,16 +7,17 @@ const Contacts = () => {
     const [lastName, setLastName] = useState('');
     const [phone, setPhone] = useState('');
     const [editingContactId, setEditingContactId] = useState(null);
-
+    const [message, setMessage] = useState(''); // État pour afficher les messages d'erreur/succès
     const token = localStorage.getItem('token');
 
-    // ➡️ Fetch contacts
+    // ➡️ Récupérer les contacts
     const fetchContacts = useCallback(async () => {
         try {
             const data = await getContacts(token);
             setContacts(data);
         } catch (err) {
             console.error('Erreur fetchContacts:', err);
+            setMessage('❌ Erreur lors de la récupération des contacts.');
         }
     }, [token]);
 
@@ -28,28 +28,35 @@ const Contacts = () => {
     // ➡️ Ajouter un contact
     const handleAddContact = async (e) => {
         e.preventDefault();
+        setMessage('');
         try {
             const newContact = await createContact({ firstName, lastName, phone }, token);
             setContacts(prev => [...prev, newContact]);
             setFirstName('');
             setLastName('');
             setPhone('');
+            setMessage('✅ Contact ajouté avec succès !');
         } catch (err) {
             console.error('Erreur handleAddContact:', err);
+            setMessage('❌ Erreur lors de l\'ajout du contact.');
         }
     };
 
     // ➡️ Mettre à jour un contact
-    const handleUpdateContact = async (id) => {
+    const handleUpdateContact = async (e) => {
+        e.preventDefault(); // Ajout de e.preventDefault() pour éviter le rechargement de la page
+        setMessage('');
         try {
-            const updated = await updateContact(id, { firstName, lastName, phone }, token);
-            setContacts(prev => prev.map(c => c._id === id ? updated : c));
+            const updated = await updateContact(editingContactId, { firstName, lastName, phone }, token);
+            setContacts(prev => prev.map(c => c._id === editingContactId ? updated : c));
             setEditingContactId(null);
             setFirstName('');
             setLastName('');
             setPhone('');
+            setMessage('✅ Contact mis à jour avec succès !');
         } catch (err) {
             console.error('Erreur handleUpdateContact:', err);
+            setMessage('❌ Erreur lors de la mise à jour du contact.');
         }
     };
 
@@ -58,8 +65,10 @@ const Contacts = () => {
         try {
             await deleteContact(id, token);
             setContacts(prev => prev.filter(c => c._id !== id));
+            setMessage('✅ Contact supprimé avec succès !');
         } catch (err) {
             console.error('Erreur handleDeleteContact:', err);
+            setMessage('❌ Erreur lors de la suppression du contact.');
         }
     };
 
@@ -71,17 +80,28 @@ const Contacts = () => {
         setPhone(contact.phone);
     };
 
-    return (
-        <div>
-            <h1>Mes contacts</h1>
+    // ➡️ Réinitialiser le formulaire
+    const handleCancelEdit = () => {
+        setEditingContactId(null);
+        setFirstName('');
+        setLastName('');
+        setPhone('');
+    };
 
-            <form onSubmit={editingContactId ? () => handleUpdateContact(editingContactId) : handleAddContact}>
+    return (
+        <div className="flex flex-col items-center mt-10">
+            <h1 className="text-2xl font-bold mb-4">Mes contacts</h1>
+            <form
+                onSubmit={editingContactId ? handleUpdateContact : handleAddContact}
+                className="flex flex-col gap-3 w-80 p-4 border rounded-lg"
+            >
                 <input
                     type="text"
                     placeholder="Prénom"
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
                     required
+                    className="p-2 border rounded"
                 />
                 <input
                     type="text"
@@ -89,6 +109,7 @@ const Contacts = () => {
                     value={lastName}
                     onChange={(e) => setLastName(e.target.value)}
                     required
+                    className="p-2 border rounded"
                 />
                 <input
                     type="text"
@@ -96,16 +117,52 @@ const Contacts = () => {
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     required
+                    className="p-2 border rounded"
                 />
-                <button type="submit">{editingContactId ? 'Mettre à jour' : 'Ajouter'}</button>
+                <div className="flex gap-2">
+                    <button
+                        type="submit"
+                        className="bg-blue-600 text-white p-2 rounded hover:bg-blue-700 flex-1"
+                    >
+                        {editingContactId ? 'Mettre à jour' : 'Ajouter'}
+                    </button>
+                    {editingContactId && (
+                        <button
+                            type="button"
+                            onClick={handleCancelEdit}
+                            className="bg-gray-400 text-white p-2 rounded hover:bg-gray-500 flex-1"
+                        >
+                            Annuler
+                        </button>
+                    )}
+                </div>
             </form>
-
-            <ul>
+            {message && (
+                <p className={`mt-4 text-center font-medium ${message.includes('✅') ? 'text-green-600' : 'text-red-600'}`}>
+                    {message}
+                </p>
+            )}
+            <ul className="mt-4 w-80">
                 {contacts.map(contact => (
-                    <li key={contact._id}>
-                        {contact.firstName} {contact.lastName} - {contact.phone}
-                        <button onClick={() => handleEdit(contact)}>Éditer</button>
-                        <button onClick={() => handleDeleteContact(contact._id)}>Supprimer</button>
+                    <li key={contact._id} className="flex justify-between items-center p-2 border-b">
+                        <div>
+                            <p className="font-medium">{contact.firstName} {contact.lastName}</p>
+                            <p className="text-gray-600">{contact.phone}</p>
+                        </div>
+                        <div className="flex gap-2">
+                            <button
+                                onClick={() => handleEdit(contact)}
+                                className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600"
+                            >
+                                Éditer
+                            </button>
+                            <button
+                                onClick={() => handleDeleteContact(contact._id)}
+                                className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                            >
+                                Supprimer
+                            </button>
+                        </div>
                     </li>
                 ))}
             </ul>
