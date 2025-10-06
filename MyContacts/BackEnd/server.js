@@ -23,3 +23,9 @@ mongoose.connect(process.env.MONGO_URI)
         app.listen(process.env.PORT || 5000, () => console.log('🚀 Serveur lancé'));
     })
     .catch(err => console.error('❌ Erreur MongoDB:', err));
+
+const cors = require('cors');
+app.use(cors({
+    origin: 'https://ton-frontend.netlify.app', // ou '*' pour tout autoriser temporairement
+    credentials: true
+}));
