@@ -39,7 +39,7 @@ const User = require('../Models/user');
  *       400:
  *         description: Utilisateur déjà existant
  */
-// ➡️ REGISTER (corrigé)
+// REGISTER
 router.post('/register', async (req, res) => {
     try {
         const { email, password } = req.body;
