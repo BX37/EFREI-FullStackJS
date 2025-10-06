@@ -1,90 +1,58 @@
-// src/pages/Contacts.js
-import React, { useState, useEffect, useContext } from 'react';
+import { useState, useEffect } from 'react';
 import { getContacts, createContact, updateContact, deleteContact } from '../services/api';
-import { AuthContext } from '../context/AuthContext';
 
-const Contacts = () => {
-    const { token } = useContext(AuthContext);
+export default function Contacts() {
     const [contacts, setContacts] = useState([]);
-    const [form, setForm] = useState({ firstName: '', lastName: '', phone: '' });
-    const [editingId, setEditingId] = useState(null);
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
+    const [phone, setPhone] = useState('');
+    const token = localStorage.getItem('token');
 
-    // 🔹 Charger les contacts
     useEffect(() => {
-        if (!token) return;
         fetchContacts();
-    }, [token]);
+    }, []);
 
     const fetchContacts = async () => {
         const data = await getContacts(token);
         setContacts(data);
     };
 
-    // 🔹 Ajouter ou mettre à jour un contact
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        if (editingId) {
-            await updateContact(editingId, form, token);
-            setEditingId(null);
-        } else {
-            await createContact(form, token);
-        }
-        setForm({ firstName: '', lastName: '', phone: '' });
+    const handleAdd = async () => {
+        await createContact({ firstName, lastName, phone }, token);
+        setFirstName(''); setLastName(''); setPhone('');
         fetchContacts();
     };
 
-    // 🔹 Supprimer un contact
     const handleDelete = async (id) => {
         await deleteContact(id, token);
         fetchContacts();
     };
 
-    // 🔹 Éditer un contact
-    const handleEdit = (contact) => {
-        setForm({
-            firstName: contact.firstName,
-            lastName: contact.lastName,
-            phone: contact.phone,
-        });
-        setEditingId(contact._id);
+    const handleUpdate = async (id) => {
+        const newPhone = prompt('Nouveau téléphone ?');
+        if (!newPhone) return;
+        await updateContact(id, { phone: newPhone }, token);
+        fetchContacts();
     };
 
     return (
         <div>
-            <h2>Mes contacts</h2>
-            <form onSubmit={handleSubmit}>
-                <input
-                    placeholder="Prénom"
-                    value={form.firstName}
-                    onChange={(e) => setForm({ ...form, firstName: e.target.value })}
-                    required
-                />
-                <input
-                    placeholder="Nom"
-                    value={form.lastName}
-                    onChange={(e) => setForm({ ...form, lastName: e.target.value })}
-                    required
-                />
-                <input
-                    placeholder="Téléphone"
-                    value={form.phone}
-                    onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                    required
-                />
-                <button type="submit">{editingId ? 'Mettre à jour' : 'Ajouter'}</button>
-            </form>
-
+            <h2>Contacts</h2>
+            <div>
+                <input placeholder="Prénom" value={firstName} onChange={e => setFirstName(e.target.value)} />
+                <input placeholder="Nom" value={lastName} onChange={e => setLastName(e.target.value)} />
+                <input placeholder="Téléphone" value={phone} onChange={e => setPhone(e.target.value)} />
+                <button onClick={handleAdd}>Ajouter</button>
+            </div>
             <ul>
-                {contacts.map((c) => (
+                {contacts.map(c => (
                     <li key={c._id}>
-                        {c.firstName} {c.lastName} - {c.phone}{' '}
-                        <button onClick={() => handleEdit(c)}>✏️</button>{' '}
-                        <button onClick={() => handleDelete(c._id)}>🗑️</button>
+                        {c.firstName} {c.lastName} - {c.phone}
+                        <button onClick={() => handleUpdate(c._id)}>Modifier</button>
+                        <button onClick={() => handleDelete(c._id)}>Supprimer</button>
                     </li>
                 ))}
             </ul>
         </div>
     );
-};
-
-export default Contacts;
+}
