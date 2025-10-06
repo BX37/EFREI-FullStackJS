@@ -1,31 +1,93 @@
-const express = require('express');
-const mongoose = require('mongoose');
-require('dotenv').config();
+// src/services/api.js
 
-const { specs, swaggerUi } = require('./swagger');
-const authRoutes = require('./routes/authRoutes');
-const contactRoutes = require('./routes/contactRoutes');
+// ✅ URL de ton backend Render
+const API_URL = 'https://efrei-fullstackjs-6.onrender.com';
 
-const app = express();
-app.use(express.json());
+// ➡️ Auth
+export const registerUser = async (data) => {
+    try {
+        const res = await fetch(`${API_URL}/auth/register`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data),
+        });
+        return await res.json();
+    } catch (err) {
+        console.error('Erreur registerUser:', err);
+        throw err;
+    }
+};
 
-// Swagger
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
+export const loginUser = async (data) => {
+    try {
+        const res = await fetch(`${API_URL}/auth/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data),
+        });
+        return await res.json();
+    } catch (err) {
+        console.error('Erreur loginUser:', err);
+        throw err;
+    }
+};
 
-// Routes
-app.use('/auth', authRoutes);
-app.use('/contacts', contactRoutes);
+// ➡️ Contacts
+export const getContacts = async (token) => {
+    try {
+        const res = await fetch(`${API_URL}/contacts`, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+        return await res.json();
+    } catch (err) {
+        console.error('Erreur getContacts:', err);
+        throw err;
+    }
+};
 
-// Connexion MongoDB + lancement serveur
-mongoose.connect(process.env.MONGO_URI)
-    .then(() => {
-        console.log('✅ MongoDB connecté');
-        app.listen(process.env.PORT || 5000, () => console.log('🚀 Serveur lancé'));
-    })
-    .catch(err => console.error('❌ Erreur MongoDB:', err));
+export const createContact = async (data, token) => {
+    try {
+        const res = await fetch(`${API_URL}/contacts`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(data),
+        });
+        return await res.json();
+    } catch (err) {
+        console.error('Erreur createContact:', err);
+        throw err;
+    }
+};
 
-const cors = require('cors');
-app.use(cors({
-    origin: 'https://ton-frontend.netlify.app', // ou '*' pour tout autoriser temporairement
-    credentials: true
-}));
+export const updateContact = async (id, data, token) => {
+    try {
+        const res = await fetch(`${API_URL}/contacts/${id}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(data),
+        });
+        return await res.json();
+    } catch (err) {
+        console.error('Erreur updateContact:', err);
+        throw err;
+    }
+};
+
+export const deleteContact = async (id, token) => {
+    try {
+        const res = await fetch(`${API_URL}/contacts/${id}`, {
+            method: 'DELETE',
+            headers: { Authorization: `Bearer ${token}` },
+        });
+        return await res.json();
+    } catch (err) {
+        console.error('Erreur deleteContact:', err);
+        throw err;
+    }
+};
