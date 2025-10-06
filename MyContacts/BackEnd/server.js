@@ -1,6 +1,5 @@
 // src/services/api.js
 
-// ✅ URL de ton backend Render
 const API_URL = 'https://efrei-fullstackjs-6.onrender.com';
 
 // ➡️ Auth
