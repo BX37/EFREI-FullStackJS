@@ -2,6 +2,13 @@
 
 const API_URL = 'https://efrei-fullstackjs-6.onrender.com';
 
+const cors = require('cors');
+app.use(cors({
+    origin: 'https://efrei-js.netlify.app', // Remplace par ton URL Netlify
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+}));
+
 // ➡️ Auth
 export const registerUser = async (data) => {
     try {

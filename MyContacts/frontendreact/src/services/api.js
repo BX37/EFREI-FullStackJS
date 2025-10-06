@@ -1,6 +1,6 @@
 // src/services/api.js
 
-const API_URL = 'https://efrei-fullstackjs-6.onrender.com'; // backend Render depuis Netlify
+const API_URL = process.env.REACT_APP_API_URL; // backend Render depuis Netlify
 
 // ➡️ Auth
 export const registerUser = async (data) => {

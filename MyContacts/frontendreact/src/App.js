@@ -11,8 +11,11 @@ function App() {
             <Routes>
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
-                <Route path="/contacts" element={token ? <Contacts /> : <Navigate to="/login" />} />
-                <Route path="*" element={<Navigate to="/login" />} />
+                <Route
+                    path="/contacts"
+                    element={token ? <Contacts /> : <Navigate to="/login" replace />}
+                />
+                <Route path="*" element={<Navigate to="/login" replace />} />
             </Routes>
         </Router>
     );
