@@ -1,36 +1,55 @@
-import React, { useState, useContext } from "react";
-import API from "../services/api";
-import { AuthContext } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
+// src/pages/Login.js
+import React, { useState, useContext } from 'react';
+import { loginUser } from '../services/api';
+import { useNavigate } from 'react-router-dom';
+import { AuthContext } from '../context/AuthContext';
 
 const Login = () => {
-    const { login } = useContext(AuthContext);
+    const { setToken } = useContext(AuthContext);
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [message, setMessage] = useState('');
     const navigate = useNavigate();
-    const [form, setForm] = useState({ email: "", password: "" });
-    const [error, setError] = useState("");
-
-    const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const res = await API.post("/auth/login", form);
-            login(res.data.token);
-            navigate("/contacts");
+            const res = await loginUser({ email, password });
+            if (res.token) {
+                setToken(res.token); // stocke le token dans le context
+                localStorage.setItem('token', res.token);
+                navigate('/contacts');
+            } else {
+                setMessage(res.message || 'Identifiants invalides');
+            }
         } catch (err) {
-            setError("Email ou mot de passe invalide");
+            setMessage('Erreur serveur');
         }
     };
 
     return (
         <div>
-            <h2>Connexion</h2>
+            <h2>Login</h2>
+            {message && <p>{message}</p>}
             <form onSubmit={handleSubmit}>
-                <input name="email" type="email" placeholder="Email" onChange={handleChange} />
-                <input name="password" type="password" placeholder="Mot de passe" onChange={handleChange} />
+                <input
+                    type="email"
+                    placeholder="Email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                />
+                <br />
+                <input
+                    type="password"
+                    placeholder="Password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                />
+                <br />
                 <button type="submit">Se connecter</button>
             </form>
-            {error && <p style={{ color: "red" }}>{error}</p>}
         </div>
     );
 };

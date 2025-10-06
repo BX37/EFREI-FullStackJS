@@ -1,33 +1,52 @@
-import React, { useState } from "react";
-import API from "../services/api";
-import { useNavigate } from "react-router-dom";
+// src/pages/Register.js
+import React, { useState } from 'react';
+import { registerUser } from '../services/api';
+import { useNavigate } from 'react-router-dom';
 
 const Register = () => {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [message, setMessage] = useState('');
     const navigate = useNavigate();
-    const [form, setForm] = useState({ email: "", password: "" });
-    const [error, setError] = useState("");
-
-    const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await API.post("/auth/register", form);
-            navigate("/login");
+            const res = await registerUser({ email, password });
+            if (res.token || res.message === 'Utilisateur créé avec succès') {
+                setMessage('Compte créé avec succès ! Connectez-vous.');
+                navigate('/login'); // redirige vers login
+            } else {
+                setMessage(res.message || 'Erreur lors de l’inscription');
+            }
         } catch (err) {
-            setError("Erreur lors de l'inscription");
+            setMessage('Erreur serveur');
         }
     };
 
     return (
         <div>
-            <h2>Inscription</h2>
+            <h2>Register</h2>
+            {message && <p>{message}</p>}
             <form onSubmit={handleSubmit}>
-                <input name="email" type="email" placeholder="Email" onChange={handleChange} />
-                <input name="password" type="password" placeholder="Mot de passe" onChange={handleChange} />
+                <input
+                    type="email"
+                    placeholder="Email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                />
+                <br />
+                <input
+                    type="password"
+                    placeholder="Password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                />
+                <br />
                 <button type="submit">S'inscrire</button>
             </form>
-            {error && <p style={{ color: "red" }}>{error}</p>}
         </div>
     );
 };
