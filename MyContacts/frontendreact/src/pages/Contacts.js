@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { getContacts, createContact, updateContact, deleteContact } from '../services/api';
 
 const Contacts = () => {
@@ -7,24 +8,42 @@ const Contacts = () => {
     const [lastName, setLastName] = useState('');
     const [phone, setPhone] = useState('');
     const [editingContactId, setEditingContactId] = useState(null);
-    const [message, setMessage] = useState(''); // État pour afficher les messages d'erreur/succès
+    const [message, setMessage] = useState('');
+    const [loading, setLoading] = useState(false);
     const token = localStorage.getItem('token');
+    const navigate = useNavigate();
 
-    // ➡️ Récupérer les contacts
     const fetchContacts = useCallback(async () => {
+        if (!token) {
+            navigate('/login');
+            return;
+        }
+
+        setLoading(true);
         try {
             const data = await getContacts(token);
-            setContacts(data);
+            if (Array.isArray(data)) {
+                setContacts(data);
+            } else {
+                console.error('La réponse n\'est pas un tableau :', data);
+                setMessage('❌ Erreur : les données reçues ne sont pas valides.');
+            }
         } catch (err) {
             console.error('Erreur fetchContacts:', err);
-            setMessage('❌ Erreur lors de la récupération des contacts.');
+            if (err.response && err.response.status === 401) {
+                localStorage.removeItem('token');
+                navigate('/login');
+            } else {
+                setMessage('❌ Erreur lors de la récupération des contacts.');
+            }
+        } finally {
+            setLoading(false);
         }
-    }, [token]);
+    }, [token, navigate]);
 
     useEffect(() => {
         fetchContacts();
     }, [fetchContacts]);
-
     // ➡️ Ajouter un contact
     const handleAddContact = async (e) => {
         e.preventDefault();
@@ -88,6 +107,9 @@ const Contacts = () => {
         setPhone('');
     };
 
+    if (loading) {
+        return <div>Chargement en cours...</div>;
+    }
     return (
         <div className="flex flex-col items-center mt-10">
             <h1 className="text-2xl font-bold mb-4">Mes contacts</h1>
