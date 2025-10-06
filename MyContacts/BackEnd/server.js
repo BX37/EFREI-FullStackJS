@@ -1,99 +1,43 @@
-// src/services/api.js
-
-const API_URL = 'https://efrei-fullstackjs-6.onrender.com';
-
+const express = require('express');
+const mongoose = require('mongoose');
 const cors = require('cors');
+require('dotenv').config();
+const { specs, swaggerUi } = require('./swagger');
+const authRoutes = require('./routes/authRoutes');
+const contactRoutes = require('./routes/contactRoutes');
+
+const app = express();
+
+// Middleware CORS (doit être déclaré avant les routes)
 app.use(cors({
-    origin: 'https://efrei-js.netlify.app', // Remplace par ton URL Netlify
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+    origin: 'https://efrei-js.netlify.app', // Remplace par ton URL Netlify exacte
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true,
 }));
 
-// ➡️ Auth
-export const registerUser = async (data) => {
-    try {
-        const res = await fetch(`${API_URL}/auth/register`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data),
-        });
-        return await res.json();
-    } catch (err) {
-        console.error('Erreur registerUser:', err);
-        throw err;
-    }
-};
+// Middleware pour parser le JSON
+app.use(express.json());
 
-export const loginUser = async (data) => {
-    try {
-        const res = await fetch(`${API_URL}/auth/login`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data),
-        });
-        return await res.json();
-    } catch (err) {
-        console.error('Erreur loginUser:', err);
-        throw err;
-    }
-};
+// Documentation Swagger
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 
-// ➡️ Contacts
-export const getContacts = async (token) => {
-    try {
-        const res = await fetch(`${API_URL}/contacts`, {
-            headers: { Authorization: `Bearer ${token}` },
-        });
-        return await res.json();
-    } catch (err) {
-        console.error('Erreur getContacts:', err);
-        throw err;
-    }
-};
+// Routes
+app.use('/auth', authRoutes);
+app.use('/contacts', contactRoutes);
 
-export const createContact = async (data, token) => {
-    try {
-        const res = await fetch(`${API_URL}/contacts`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify(data),
-        });
-        return await res.json();
-    } catch (err) {
-        console.error('Erreur createContact:', err);
-        throw err;
-    }
-};
+// Gestion des erreurs 404
+app.use((req, res) => {
+    res.status(404).json({ message: 'Route non trouvée' });
+});
 
-export const updateContact = async (id, data, token) => {
-    try {
-        const res = await fetch(`${API_URL}/contacts/${id}`, {
-            method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify(data),
+// Connexion à MongoDB et démarrage du serveur
+mongoose.connect(process.env.MONGO_URI)
+    .then(() => {
+        console.log('✅ MongoDB connecté');
+        const PORT = process.env.PORT || 5000;
+        app.listen(PORT, () => {
+            console.log(`🚀 Serveur lancé sur le port ${PORT}`);
         });
-        return await res.json();
-    } catch (err) {
-        console.error('Erreur updateContact:', err);
-        throw err;
-    }
-};
-
-export const deleteContact = async (id, token) => {
-    try {
-        const res = await fetch(`${API_URL}/contacts/${id}`, {
-            method: 'DELETE',
-            headers: { Authorization: `Bearer ${token}` },
-        });
-        return await res.json();
-    } catch (err) {
-        console.error('Erreur deleteContact:', err);
-        throw err;
-    }
-};
+    })
+    .catch(err => console.error('❌ Erreur MongoDB:', err));
