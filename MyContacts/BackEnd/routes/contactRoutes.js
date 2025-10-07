@@ -27,10 +27,7 @@ const { authenticate } = require('../middleware');
 router.get('/', authenticate, async (req, res) => {
     try {
         const contacts = await Contact.find({ userId: req.userId });
-        if (!contacts) {
-            return res.status(404).json({ message: 'Aucun contact trouvé' });
-        }
-        res.json(contacts); // Assure-toi que contacts est un tableau
+        res.json(contacts);
     } catch (err) {
         console.error('Erreur lors de la récupération des contacts:', err);
         res.status(500).json({ message: 'Erreur serveur' });
