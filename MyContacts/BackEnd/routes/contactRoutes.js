@@ -27,6 +27,7 @@ const { authenticate } = require('../middleware');
 router.get('/', authenticate, async (req, res) => {
     try {
         const contacts = await Contact.find({ userId: req.userId });
+        console.log(contacts);
         res.json(contacts);
     } catch (err) {
         console.error('Erreur lors de la récupération des contacts:', err);
