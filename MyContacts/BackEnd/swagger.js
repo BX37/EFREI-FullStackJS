@@ -11,7 +11,7 @@ const options = {
         },
         servers: [
             {
-                url: 'https://efrei-fullstackjs-6.onrender.com', // Remplace par l'URL de ton backend déployé
+                url: 'https://efrei-fullstackjs-6.onrender.com',
                 description: 'Serveur de production',
             },
             {
