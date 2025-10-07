@@ -47,8 +47,8 @@ router.post('/register', async (req, res) => {
         const existingUser = await User.findOne({ email });
         if (existingUser) return res.status(400).json({ message: 'Utilisateur déjà existant' });
 
-        const user = new User({ email, password }); // 👈 mot de passe en clair
-        await user.save(); // 👈 il sera hashé automatiquement par le pre('save')
+        const user = new User({ email, password }); //
+        await user.save(); //
 
         res.status(201).json({ message: 'Utilisateur créé avec succès' });
     } catch (err) {
