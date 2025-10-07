@@ -21,22 +21,21 @@ const Contacts = () => {
 
         setLoading(true);
         try {
+            console.log('Token utilisé:', token); // Log pour vérifier le token
             const data = await getContacts(token);
             console.log('Données reçues:', data); // Log pour vérifier la structure de la réponse
             if (Array.isArray(data)) {
                 setContacts(data);
+                if (data.length === 0) {
+                    setMessage('ℹ️ Aucun contact trouvé. Ajoute un contact pour commencer.');
+                }
             } else {
                 console.error('La réponse n\'est pas un tableau :', data);
                 setMessage('❌ Erreur : les données reçues ne sont pas valides.');
             }
         } catch (err) {
             console.error('Erreur fetchContacts:', err);
-            if (err.response) {
-                console.error('Réponse du serveur:', err.response.data);
-                setMessage(`❌ Erreur : ${err.response.data.message || 'Erreur inconnue'}`);
-            } else {
-                setMessage('❌ Erreur lors de la récupération des contacts.');
-            }
+            setMessage(`❌ Erreur : ${err.message || 'Erreur inconnue'}`);
         } finally {
             setLoading(false);
         }
@@ -46,12 +45,14 @@ const Contacts = () => {
     useEffect(() => {
         fetchContacts();
     }, [fetchContacts]);
+
     // ➡️ Ajouter un contact
     const handleAddContact = async (e) => {
         e.preventDefault();
         setMessage('');
         try {
             const newContact = await createContact({ firstName, lastName, phone }, token);
+            console.log(newContact)
             setContacts(prev => [...prev, newContact]);
             setFirstName('');
             setLastName('');
