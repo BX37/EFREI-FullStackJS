@@ -8,13 +8,14 @@ const contactRoutes = require('./routes/contactRoutes');
 
 const app = express();
 
-// Middleware CORS.
-app.use(cors({
-    origin: 'https://efrei-js.netlify.app',
+const corsOptions = {
+    origin: ['https://efrei-js.netlify.app', 'http://localhost:5000', 'https://efrei-fullstackjs-6.onrender.com'],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
-}));
+};
+
+app.use(cors(corsOptions));
 
 // Middleware pour parser le JSON
 app.use(express.json());
