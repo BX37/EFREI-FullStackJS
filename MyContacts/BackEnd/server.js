@@ -16,28 +16,6 @@ app.use(cors({
     credentials: true,
 }));
 
-app.get('/create-test-contact', async (req, res) => {
-    try {
-        const user = await User.findOne({ email: 'test@example.com' });
-        if (!user) {
-            return res.status(404).json({ message: 'Utilisateur de test non trouvé' });
-        }
-
-        const testContact = new Contact({
-            firstName: 'Test',
-            lastName: 'Contact',
-            phone: '0123456789',
-            userId: user._id
-        });
-        await testContact.save();
-        res.json({ message: 'Contact de test créé avec succès', contact: testContact });
-    } catch (err) {
-        console.error('Erreur lors de la création du contact de test:', err);
-        res.status(500).json({ message: 'Erreur serveur' });
-    }
-});
-
-
 // Middleware pour parser le JSON
 app.use(express.json());
 
