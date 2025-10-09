@@ -31,11 +31,11 @@ const Contacts = () => {
                 }
             } else {
                 console.error('La réponse n\'est pas un tableau :', data);
-                setMessage('❌ Erreur : les données reçues ne sont pas valides.');
+                setMessage(' Erreur : les données reçues ne sont pas valides.');
             }
         } catch (err) {
             console.error('Erreur fetchContacts:', err);
-            setMessage(`❌ Erreur : ${err.message || 'Erreur inconnue'}`);
+            setMessage(` Erreur : ${err.message || 'Erreur inconnue'}`);
         } finally {
             setLoading(false);
         }
@@ -57,10 +57,10 @@ const Contacts = () => {
             setFirstName('');
             setLastName('');
             setPhone('');
-            setMessage('✅ Contact ajouté avec succès !');
+            setMessage(' Contact ajouté avec succès !');
         } catch (err) {
             console.error('Erreur handleAddContact:', err);
-            setMessage('❌ Erreur lors de l\'ajout du contact.');
+            setMessage(' Erreur lors de l\'ajout du contact.');
         }
     };
 
@@ -75,10 +75,10 @@ const Contacts = () => {
             setFirstName('');
             setLastName('');
             setPhone('');
-            setMessage('✅ Contact mis à jour avec succès !');
+            setMessage(' Contact mis à jour avec succès !');
         } catch (err) {
             console.error('Erreur handleUpdateContact:', err);
-            setMessage('❌ Erreur lors de la mise à jour du contact.');
+            setMessage(' Erreur lors de la mise à jour du contact.');
         }
     };
 
@@ -87,10 +87,10 @@ const Contacts = () => {
         try {
             await deleteContact(id, token);
             setContacts(prev => prev.filter(c => c._id !== id));
-            setMessage('✅ Contact supprimé avec succès !');
+            setMessage(' Contact supprimé avec succès !');
         } catch (err) {
             console.error('Erreur handleDeleteContact:', err);
-            setMessage('❌ Erreur lors de la suppression du contact.');
+            setMessage(' Erreur lors de la suppression du contact.');
         }
     };
 
@@ -163,7 +163,7 @@ const Contacts = () => {
                 </div>
             </form>
             {message && (
-                <p className={`mt-4 text-center font-medium ${message.includes('✅') ? 'text-green-600' : 'text-red-600'}`}>
+                <p className={`mt-4 text-center font-medium ${message.includes('') ? 'text-green-600' : 'text-red-600'}`}>
                     {message}
                 </p>
             )}

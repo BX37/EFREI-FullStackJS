@@ -4,10 +4,10 @@ import { registerUser } from "../services/api";
 
 export default function Register() {
     const [formData, setFormData] = useState({ email: "", password: "" });
-    const [message, setMessage] = useState(""); // Message à afficher
+    const [message, setMessage] = useState("");
     const [loading, setLoading] = useState(false);
-    const [isRegistered, setIsRegistered] = useState(false); // État pour gérer la redirection
-    const navigate = useNavigate(); // Hook pour la redirection
+    const [isRegistered, setIsRegistered] = useState(false);
+    const navigate = useNavigate();
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -20,13 +20,13 @@ export default function Register() {
         try {
             const res = await registerUser(formData);
             if (res.error) {
-                setMessage(`❌ Erreur : ${res.error}`);
+                setMessage(` Erreur : ${res.error}`);
             } else {
-                setMessage("✅ Utilisateur enregistré avec succès !");
+                setMessage(" Utilisateur enregistré avec succès !");
                 setIsRegistered(true); // Active la redirection
             }
         } catch (err) {
-            setMessage("❌ Erreur serveur, impossible de s'enregistrer.");
+            setMessage(" Erreur serveur, impossible de s'enregistrer.");
         } finally {
             setLoading(false);
         }

@@ -16,14 +16,14 @@ const Login = () => {
             const data = await loginUser({ email, password });
             if (data.token) {
                 localStorage.setItem('token', data.token);
-                setMessage('✅ Connexion réussie ! Redirection en cours...');
+                setMessage(' Connexion réussie ! Redirection en cours...');
                 setIsLoggedIn(true); // Active la redirection
             } else {
-                setMessage(`❌ Erreur : ${data.message || 'Email ou mot de passe incorrect'}`);
+                setMessage(` Erreur : ${data.message || 'Email ou mot de passe incorrect'}`);
             }
         } catch (err) {
             console.error(err);
-            setMessage('❌ Erreur serveur, impossible de se connecter.');
+            setMessage(' Erreur serveur, impossible de se connecter.');
         }
     };
 
@@ -62,7 +62,7 @@ const Login = () => {
                 </button>
             </form>
             {message && (
-                <p className={`mt-4 text-center font-medium ${message.includes('✅') ? 'text-green-600' : 'text-red-600'}`}>
+                <p className={`mt-4 text-center font-medium ${message.includes('') ? 'text-green-600' : 'text-red-600'}`}>
                     {message}
                 </p>
             )}

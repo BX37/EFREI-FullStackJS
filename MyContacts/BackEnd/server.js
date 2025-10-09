@@ -9,7 +9,7 @@ const contactRoutes = require('./routes/contactRoutes');
 const app = express();
 
 app.use(cors({
-    origin: '*', // Remplace par ton URL Netlify exacte
+    origin: '*',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
